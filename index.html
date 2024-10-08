@@ -22,7 +22,7 @@ video.addEventListener('playing', function () { videoLoading.style.display = 'no
 
 function loadVideo(sourceUrl) { if (Hls.isSupported()) { if (window.hls) { window.hls.destroy(); } var hls = new Hls(); hls.loadSource(sourceUrl); hls.attachMedia(video); window.hls = hls; } else if (video.canPlayType('application/vnd.apple.mpegurl')) { video.src = sourceUrl; } video.play(); }
 
-function loadChannels() { // Simulate delay for loading channels setTimeout(() => { fetch('https://raw.githubusercontent.com/sajitaly/IndCAST/refs/heads/main/indcast.m3u') .then(response => response.text()) .then(data => { const lines = data.split('\n'); let channels = []; let currentChannel = {};
+function loadChannels() { // Simulate delay for loading channels setTimeout(() => { fetch('https://raw.githubusercontent.com/RsLive-Tv/Rs-App/refs/heads/main/Playlist.m3u') .then(response => response.text()) .then(data => { const lines = data.split('\n'); let channels = []; let currentChannel = {};
 
 lines.forEach(line => { if (line.startsWith('#EXTINF')) { const logoMatch = line.match(/tvg-logo="(.*?)"/); const nameMatch = line.match(/,(.*)/); if (logoMatch && nameMatch) { currentChannel.logo = logoMatch[1]; currentChannel.name = nameMatch[1]; } } else if (line.startsWith('http')) { currentChannel.url = line.trim(); channels.push(currentChannel); currentChannel = {}; } });
 
