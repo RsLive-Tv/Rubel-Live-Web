@@ -4,335 +4,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV Streaming</title>
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css" />
-    <script src="https://cdn.plyr.io/3.6.8/plyr.polyfilled.js"></script>
+    <title>INDCAST</title>
+    <meta name="description" content="ENJOY FREE LIVE IPTV">
+    <meta name="keywords" content="Watch live sports streaming online, including football, basketball, baseball, hockey, and more. Stream your favorite sports teams and events in HD, with no cable subscription required.">
+    <meta name="author" content="Masud Rana">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="shortcut icon" type="image/x-icon" href="https://i.ibb.co/37fVLxB/f4027915ec9335046755d489a14472f2.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.6.2/dist/plyr.css" />
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.6.12/dist/plyr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.1.4/dist/hls.min.js"></script>
+<link rel="me" href="https://www.blogger.com/profile/02775090528929566676" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+</head>
+
+<body>
+    <!-- Custom Text Section -->
+    <div class="custom-text">
+        <b>RUBEL LIVE TV</b>
+    </div>
+
+    <!-- Video Player Section -->
+    <div class="video-player">
+        
+        <div id="videoLoading" class="loading">
+            <p>Loading video...</p>
+        </div>
+        <video id="videoPlayer" controls crossorigin playsinline muted autoplay>
+            <source id="videoSource" type="application/vnd.apple.mpegurl" src="">
+        </video>
+    </div>
+
+    <!-- Channel List Section -->
+    <div class="channel-list">
+        <h2>Channel List</h2>
+        <div id="channelLoading" class="loading">
+            <p>Loading channels...</p>
+        </div>
+        <div class="channel-buttons" id="channelList" style="display: none;">
+            <!-- Channels will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const videoLoading = document.getElementById('videoLoading');
+        const channelLoading = document.getElementById('channelLoading');
+        const channelList = document.getElementById('channelList');
+
+        // Display video loading animation
+        video.addEventListener('waiting', function () {
+            videoLoading.style.display = 'block';
+        });
+
+        video.addEventListener('playing', function () {
+            videoLoading.style.display = 'none';
+        });
+
+        // Load demo video when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            const demoVideoUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+            loadVideo(demoVideoUrl);
+
+            // Fetch and load channels
+            loadChannels();
+        });
+
+        function loadVideo(sourceUrl) {
+            if (Hls.isSupported()) {
+                if (window.hls) {
+                    window.hls.destroy();
+                }
+                var hls = new Hls();
+                hls.loadSource(sourceUrl);
+                hls.attachMedia(video);
+                window.hls = hls;
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = sourceUrl;
+            }
+            video.play();
+        }
+
+        function loadChannels() {
+            // Simulate delay for loading channels
+            setTimeout(() => {
+                fetch('https://raw.githubusercontent.com/RsLive-Tv/Rs-App/refs/heads/main/Playlist.m3u')
+                    .then(response => response.text())
+                    .then(data => {
+                        const lines = data.split('\n');
+                        let channels = [];
+                        let currentChannel = {};
+
+                        lines.forEach(line => {
+                            if (line.startsWith('#EXTINF')) {
+                                const logoMatch = line.match(/tvg-logo="(.*?)"/);
+                                const nameMatch = line.match(/,(.*)/);
+                                if (logoMatch && nameMatch) {
+                                    currentChannel.logo = logoMatch[1];
+                                    currentChannel.name = nameMatch[1];
+                                }
+                            } else if (line.startsWith('http')) {
+                                currentChannel.url = line.trim();
+                                channels.push(currentChannel);
+                                currentChannel = {};
+                            }
+                        });
+
+                        channels.forEach(channel => {
+                            const channelButton = document.createElement('a');
+                            channelButton.href = "#";
+                            channelButton.classList.add('channel-link');
+                            channelButton.setAttribute('data-link', channel.url);
+
+                            const logoImg = document.createElement('img');
+                            logoImg.src = channel.logo;
+                            logoImg.alt = channel.name + ' Logo';
+
+                            channelButton.appendChild(logoImg);
+                            channelList.appendChild(channelButton);
+                        });
+
+                        // Display channels after loading
+                        channelLoading.style.display = 'none';
+                        channelList.style.display = 'flex';
+
+                        // Add event listeners to channel links
+                        document.querySelectorAll('.channel-link').forEach(function (link) {
+                            link.addEventListener('click', function (event) {
+                                event.preventDefault();
+                                const newSource = this.getAttribute('data-link');
+                                loadVideo(newSource);
+                            });
+                        });
+                    });
+            }, 2000); // Simulating a delay for demonstration
+        }
+    </script>
+
     <style>
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #181818;
             color: #fff;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
+        /* Custom Text Styling */
+        .custom-text {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .custom-text h1 {
+            font-size: 2rem;
+            color: #4CAF50;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-player {
             padding: 20px;
-            border-radius: 10px;
-            background-color: #2b2b2b;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin: 20px 0;
+            background-color: #1a1a1a;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .video-wrapper {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        .video-player h2 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
 
-        #video-player {
+        .video-player video {
             width: 100%;
             height: auto;
-        }
-
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 24px;
-            color: #4CAF50;
+            border-radius: 10px;
+            border: 2px solid #4CAF50;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .loading {
             font-size: 18px;
             color: white;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .loading .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #4CAF50;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .playlist-container {
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.8);
             padding: 10px;
-            border: 1px solid #ccc;
             border-radius: 10px;
-            background-color: #333;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: block;
+            text-align: center;
         }
 
-        #playlist {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        #playlist li {
-            width: 100px;
-            height: 100px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #4CAF50;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        #playlist li:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
-        }
-
-        #playlist img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .login-container {
+        .channel-list {
             background-color: #2b2b2b;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
             text-align: center;
-            max-width: 400px;
-            margin: auto;
         }
 
-        .login-container h2 {
-            color: #4CAF50;
-        }
-
-        .login-container input {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: none;
-        }
-
-        .login-container button {
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
+        .channel-list h2 {
             background-color: #4CAF50;
             color: white;
-            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
 
-        .login-container button:hover {
-            background-color: #45a049;
+        .channel-buttons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
         }
 
-        .error {
-            color: red;
-            margin-top: 10px;
+        .channel-buttons a {
+            background-color: #333;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .channel-buttons a img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .channel-buttons a:hover {
+            background-color: #4CAF50;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
         }
 
         @media (max-width: 768px) {
-            #playlist li {
+            .video-player,
+            .channel-list {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .channel-buttons a {
                 width: 80px;
                 height: 80px;
             }
 
-            h2 {
-                font-size: 20px;
-            }
-
-            .playlist-container {
-                max-height: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #playlist li {
+            .channel-buttons a img {
                 width: 60px;
                 height: 60px;
             }
-
-            h2 {
-                font-size: 18px;
-            }
-
-            .playlist-container {
-                max-height: 250px;
-            }
         }
     </style>
-</head>
 
-<body>
+</body>
 
-    <div id="login-container" class="login-container">
-    	<h1><b>"iNDCAST"</b></h1>
-        <h2>Pannel</h2>
-        <input type="text" id="username" placeholder="Username" />
-        <input type="password" id="password" placeholder="Password" />
-        <button onclick="validateLogin()">Login</button>
-        <div id="error-message" class="error"></div>
-    </div>
-
-    <div class="container" id="content" style="display: none;">
-        <div id="videoLoading" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            Loading video...
-        </div>
-        <div class="video-wrapper">
-            <video id="video-player" class="plyr" playsinline controls autoplay muted>
-                <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4" size="720">
-            </video>
-        </div>
-        <div style="text-align: center;"><span style="color: white; font-size: xx-small;">loading... may take some time due to local host</span></div>
-         <p><div style="text-align: center;"><span style="color: white;font-size: x-small;">User : admin (<b><span style="color: #6aa84f;">Active</span></b><span style="color: white;">)</span></div>
-        <h2>👇🏻Channel List👇🏻</h2>
-        <div id="channelLoading" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            Loading channels...
-        </div>
-        <div class="playlist-container">
-            <ul id="playlist">
-                <!-- Channels will be dynamically added here -->
-            </ul>
-        </div>
-    </div>
-
-    <script>
-        function validateLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('error-message');
-
-            if (username === 'admin' && password === 'admin') {
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            } else {
-                errorMessage.textContent = 'Invalid username or password. Please try again.';
-            }
-        }
-
-        const player = new Plyr('#video-player');
-
-        // Loading video and channel lists
-        document.addEventListener('DOMContentLoaded', function () {
-            loadVideo();
-            loadChannels();
-        }); 
-
-        function loadVideo() {
-            const videoLoading = document.getElementById('videoLoading');
-            videoLoading.style.display = 'block'; // Show loading animation
-            const videoPlayer = document.getElementById('video-player');
-            videoPlayer.addEventListener('canplay', () => {
-                videoLoading.style.display = 'none'; // Hide loading animation when video is ready
-            });
-        }
-
-        function loadChannels() {
-            const channelLoading = document.getElementById('channelLoading');
-            channelLoading.style.display = 'block'; // Show loading animation
-            const m3uUrl = 'https://raw.githubusercontent.com/RsLive-Tv/Rs-App/refs/heads/main/Playlist.m3u'; // Replace with your M3U URL
-            fetch(m3uUrl)
-                .then(response => response.text())
-                .then(data => {
-                    const playlistElement = document.getElementById('playlist');
-                    const lines = data.split('\n');
-                    let channelList = [];
-
-                    lines.forEach(line => {
-                        line = line.trim();
-                        if (line.startsWith('#EXTINF')) {
-                            const match = line.match(/tvg-logo="(.*?)"/);
-                            const logoUrl = match ? match[1] : ''; // Get the logo URL
-                            channelList.push({ logo: logoUrl, url: '' }); // Create an entry for the channel
-                        } else if (line && !line.startsWith('#')) {
-                            channelList[channelList.length - 1].url = line; // Set the URL for the last added channel
-                        }
-                    });
-
-                    channelList.forEach(channel => {
-                        const li = document.createElement('li');
-                        const img = document.createElement('img');
-                        img.src = channel.logo; // Set the logo URL
-                        img.alt = "Channel Logo"; // Alt text for accessibility
-                        img.onerror = () => {
-                            img.src = 'https://via.placeholder.com/100'; // Placeholder image if logo fails to load
-                        };
-                        li.appendChild(img);
-
-                        li.addEventListener('click', () => {
-                            const videoLoading = document.getElementById('videoLoading');
-                            videoLoading.style.display = 'block'; // Show loading animation when clicking channel
-                            
-                            player.source = {
-                                type: 'video',
-                                sources: [
-                                    { src: channel.url, type: 'application/x-mpegURL' }
-                                ]
-                            };
-
-                            player.play();
-
-                            // Hide loading animation when video is ready to play
-                            player.on('canplay', () => {
-                                videoLoading.style.display = 'none'; // Hide loading animation when video is ready
-                            });
-                        });
-
-                        playlistElement.appendChild(li);
-                    });
-
-                    channelLoading.style.display = 'none'; // Hide loading animation after loading channels
-                })
-                .catch(error => console.error('Error loading M3U:', error));
-        }
-
-        // Fullscreen change event
-        player.on('enterfullscreen', () => {
-            // Request to lock the orientation to landscape
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(error => {
-                    console.error('Orientation lock failed:', error);
-                });
-            }
-        });
-
-        player.on('exitfullscreen', () => {
-            // Release the orientation lock
-            if (screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock().catch(error => {
-                    console.error('Orientation unlock failed:', error);
-                });
-            }
-        });
-    </script>
-<script src="https://www.drv.tw/inc/wd.js?s=fgducswy3ghmpr6sromjga"></script></body>
 </html> 
